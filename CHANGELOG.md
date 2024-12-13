@@ -1,3 +1,10 @@
+## [1.0.1](https://github.com/hseelawi/discord_bot/compare/v1.0.0...v1.0.1) (2024-12-13)
+
+
+### Bug Fixes
+
+* update apt and pip, wheels and setuptools in dockerfile build stage ([aacc572](https://github.com/hseelawi/discord_bot/commit/aacc57291d583bc6ebee3c1b7063c0c9812be27c))
+
 # 1.0.0 (2024-12-13)
 
 
