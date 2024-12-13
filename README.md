@@ -4,6 +4,7 @@ A Discord bot that automatically sends playfully mean birthday wishes and GIFs t
 ## Requirements
 - Python 3.11
 - Poetry 1.8.3
+- Docker (optional but highly recommended)
 
 ## Project Structure
 ```
@@ -12,12 +13,21 @@ A Discord bot that automatically sends playfully mean birthday wishes and GIFs t
 ├── prompt.txt      # Claude prompt template
 ├── settings.py     # Configuration settings
 ├── poetry.lock     # Poetry dependency lock file
-└── pyproject.toml  # Poetry project configuration
+├── pyproject.toml  # Poetry project configuration
+├── Dockerfile      # Docker image configuration
+└── compose.yaml  # Docker Compose configuration
 ```
 
 ## Installation
+
+### Using Poetry
 ```bash
 poetry install --no-root
+```
+
+### Using Docker
+```bash
+docker-compose up -d
 ```
 
 ## Configuration
@@ -35,7 +45,6 @@ DATA_PATH=path_to_birthdays_data    # Local file path or S3 URI to birthday csv 
 
 ## Birthday Data
 The bot reads birthday data from a CSV file specified by the `DATA_PATH` environment variable. The file can be stored locally or in an S3 bucket. The CSV should have the following structure:
-
 ```csv
 username,birthday
 user123,1990-01-15
@@ -47,11 +56,36 @@ The columns are:
 - `birthday`: Birthday in YYYY-MM-DD format
 
 ## Running the Bot
+
+### Using Poetry
 ```bash
 poetry run python main.py
+```
+
+### Using Docker
+The bot can be run using Docker in two ways:
+
+1. Using Docker Compose (recommended):
+```bash
+docker-compose up -d
+```
+
+2. Using Docker directly:
+```bash
+docker build -t birthday-bot .
+docker run --env-file .env birthday-bot
 ```
 
 The bot will:
 1. Check for birthdays in the configured data source
 2. Send a GIF and AI-generated birthday message for each celebrant
 3. Automatically shut down after processing birthdays
+
+## Docker Configuration Notes
+- The Docker setup uses a secure multi-stage build to minimise the final image size and make it more secure
+- The bot runs as a non-root user inside the container for security
+- AWS credentials for S3 access can be provided through:
+  - Environment variables (AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY)
+  - IAM roles when running on AWS infrastructure
+  - Mount points specified in compose.yaml
+- Local files can be mounted using volumes in compose.yml
