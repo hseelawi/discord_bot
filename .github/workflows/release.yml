@@ -1,0 +1,94 @@
+name: Semantic Release
+on:
+  push:
+    branches: [ main ]
+jobs:
+  release:
+    name: Release
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
+      packages: write
+      
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: 'npm'
+          check-latest: true
+          
+      - name: Install dependencies
+        run: npm ci
+        
+      - name: Release
+        id: semantic-release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          OUTPUT=$(npx semantic-release)
+          if [ $? -eq 0 ]; then
+            echo "new_release_published=true" >> $GITHUB_OUTPUT
+            VERSION=$(echo "$OUTPUT" | grep -oP "Created tag \K[^\s]+" | tr -d 'v')
+            if [ -n "$VERSION" ]; then
+              echo "new_release_version=$VERSION" >> $GITHUB_OUTPUT
+              echo "A new release $VERSION was published"
+            else
+              echo "Error: Could not extract version number"
+              exit 1
+            fi
+          else
+            echo "new_release_published=false" >> $GITHUB_OUTPUT
+            echo "No new release was published"
+          fi
+
+      - name: Debug Release Output
+        if: steps.semantic-release.outputs.new_release_published == 'true'
+        run: |
+          echo "Release Version: ${{ steps.semantic-release.outputs.new_release_version }}"
+          echo "Full Image Tag: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ secrets.ECR_REPOSITORY }}:${{ steps.semantic-release.outputs.new_release_version }}"
+        
+      - name: Post Release Status
+        if: steps.semantic-release.outputs.new_release_published != 'true'
+        run: echo "No new release was published" >> $GITHUB_STEP_SUMMARY
+
+      - name: Set up Docker Buildx
+        if: steps.semantic-release.outputs.new_release_published == 'true'
+        uses: docker/setup-buildx-action@v3
+        
+      - name: Configure AWS credentials
+        if: steps.semantic-release.outputs.new_release_published == 'true'
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+          
+      - name: Login to Amazon ECR
+        if: steps.semantic-release.outputs.new_release_published == 'true'
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+        
+      - name: Build and push Docker image
+        if: steps.semantic-release.outputs.new_release_published == 'true'
+        env:
+          ECR_REGISTRY: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com
+          ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY }}
+          IMAGE_TAG: ${{ steps.semantic-release.outputs.new_release_version }}
+        run: |
+          if [ -z "$IMAGE_TAG" ]; then
+            echo "Error: IMAGE_TAG is empty"
+            exit 1
+          fi
+          echo "Building image with tag: $IMAGE_TAG"
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
