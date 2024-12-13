@@ -3,6 +3,10 @@ FROM python:3.11-slim AS builder
 
 WORKDIR /app
 
+# Update dependencies
+RUN apt update
+RUN pip install -U setuptools wheel pip
+
 # Install build dependencies
 RUN pip install poetry==1.8.3
 
