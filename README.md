@@ -8,7 +8,6 @@ A Discord bot that automatically sends playfully mean birthday wishes and GIFs t
 ## Project Structure
 ```
 .
-├── birthdays.csv    # Birthday data
 ├── main.py         # Bot implementation
 ├── prompt.txt      # Claude prompt template
 ├── settings.py     # Configuration settings
@@ -18,7 +17,7 @@ A Discord bot that automatically sends playfully mean birthday wishes and GIFs t
 
 ## Installation
 ```bash
-poetry install
+poetry install --no-root
 ```
 
 ## Configuration
@@ -31,12 +30,21 @@ TENOR_API_KEY=your_tenor_api_key
 TENOR_QUERY=birthday+dance    # Search query for Tenor GIFs
 CLAUDE_API_KEY=your_claude_api_key
 CLAUDE_MODEL=claude-3-sonnet-20240229
+DATA_PATH=path_to_birthdays_data    # Local file path or S3 URI to birthday csv (see section below)
 ```
 
 ## Birthday Data
-Create a `birthdays.csv` file with the following columns:
+The bot reads birthday data from a CSV file specified by the `DATA_PATH` environment variable. The file can be stored locally or in an S3 bucket. The CSV should have the following structure:
+
+```csv
+username,birthday
+user123,1990-01-15
+johndoe,1995-07-30
+```
+
+The columns are:
 - `username`: Discord username
-- `birthday`: Birthday in any format parseable by pandas (e.g., YYYY-MM-DD)
+- `birthday`: Birthday in YYYY-MM-DD format
 
 ## Running the Bot
 ```bash
@@ -44,6 +52,6 @@ poetry run python main.py
 ```
 
 The bot will:
-1. Check for birthdays in `birthdays.csv`
+1. Check for birthdays in the configured data source
 2. Send a GIF and AI-generated birthday message for each celebrant
 3. Automatically shut down after processing birthdays
