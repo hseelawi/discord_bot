@@ -111,3 +111,13 @@ The bot runs as a containerised application that:
 The Step Functions workflow is straightforward - it attempts to run the birthday bot container with built-in retry logic and exponential backoff, and if it still fails after retries, it publishes a notification to SNS. This ensures we're aware of any persistent issues with the bot's execution.
 
 While the bot could be run more simply using local crontab on Unix-like systems, this over-engineered AWS architecture was chosen for fun and as a learning exercise in cloud services! The AWS deployment does provide better reliability, monitoring, and error handling through its managed services.
+
+## To Do Next
+Future improvements planned for this project:
+- Implement unit tests and integration tests
+- Enable Dependabot for automated dependency updates
+- Improve CI/CD workflow:
+    - Add test automation
+    - Add code quality checks
+    - Implement automated security scanning
+    - Add automated build and deployment validation
