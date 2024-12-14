@@ -1,3 +1,17 @@
+## [1.0.2](https://github.com/hseelawi/discord_bot/compare/v1.0.1...v1.0.2) (2024-12-14)
+
+
+### Bug Fixes
+
+* allow multi-arch builds ([963603b](https://github.com/hseelawi/discord_bot/commit/963603b61ce4eb87d036d2e004ca7d7a5fb6009c))
+
+## [1.0.2](https://github.com/hseelawi/discord_bot/compare/v1.0.1...v1.0.2) (2024-12-14)
+
+
+### Bug Fixes
+
+* allow multi-arch builds ([6b841b2](https://github.com/hseelawi/discord_bot/commit/6b841b221674f8531fe4a8bb6ca84785ca3c6bc9))
+
 ## [1.0.1](https://github.com/hseelawi/discord_bot/compare/v1.0.0...v1.0.1) (2024-12-13)
 
 

@@ -73,6 +73,10 @@ jobs:
         if: steps.semantic-release.outputs.new_release_published != 'true'
         run: echo "No new release was published" >> $GITHUB_STEP_SUMMARY
 
+      - name: Set up QEMU
+        if: steps.semantic-release.outputs.new_release_published == 'true'
+        uses: docker/setup-qemu-action@v3
+        
       - name: Set up Docker Buildx
         if: steps.semantic-release.outputs.new_release_published == 'true'
         uses: docker/setup-buildx-action@v3
@@ -96,11 +100,11 @@ jobs:
           ECR_REGISTRY: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com
           ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY }}
           IMAGE_TAG: ${{ steps.semantic-release.outputs.new_release_version }}
-        run: |
-          if [ -z "$IMAGE_TAG" ]; then
-            echo "Error: IMAGE_TAG is empty"
-            exit 1
-          fi
-          echo "Building image with tag: $IMAGE_TAG"
-          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          platforms: linux/amd64,linux/arm64
+          tags: ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ env.IMAGE_TAG }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
