@@ -1,3 +1,10 @@
+## [1.0.3](https://github.com/hseelawi/discord_bot/compare/v1.0.2...v1.0.3) (2024-12-14)
+
+
+### Bug Fixes
+
+* add latest tag to docker image to simplify cd ([23c8035](https://github.com/hseelawi/discord_bot/commit/23c8035e3ce24fdb0496d7ab2e0d7f416c1fba68))
+
 ## [1.0.2](https://github.com/hseelawi/discord_bot/compare/v1.0.1...v1.0.2) (2024-12-14)
 
 
