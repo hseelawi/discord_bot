@@ -89,3 +89,25 @@ The bot will:
   - IAM roles when running on AWS infrastructure
   - Mount points specified in compose.yaml
 - Local files can be mounted using volumes in compose.yml
+
+## Architecture
+![Architecture Diagram](images/architectural_diagram.png)
+
+The bot is deployed on AWS using:
+- EventBridge Scheduler: Triggers the bot daily at 11 AM UTC
+- Step Functions: Orchestrates the execution flow and handles failures  
+- ECS Fargate: Runs the bot in a containerised environment
+- SNS: Handles failure notifications
+- Discord API: Sends birthday messages to the configured channel
+
+The bot runs as a containerised application that:
+1. Reads birthday data from the configured source
+2. Generates personalised messages using Claude
+3. Fetches celebration GIFs from Tenor 
+4. Posts the birthday wishes to Discord
+
+![Step Functions Workflow](images/step_functions.png)
+
+The Step Functions workflow is straightforward - it attempts to run the birthday bot container with built-in retry logic and exponential backoff, and if it still fails after retries, it publishes a notification to SNS. This ensures we're aware of any persistent issues with the bot's execution.
+
+While the bot could be run more simply using local crontab on Unix-like systems, this over-engineered AWS architecture was chosen for fun and as a learning exercise in cloud services! The AWS deployment does provide better reliability, monitoring, and error handling through its managed services.
