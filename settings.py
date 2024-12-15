@@ -62,4 +62,4 @@ def get_settings() -> Settings:
     """
     Create and return a cached Settings instance.
     """
-    return Settings()
+    return Settings()  # type: ignore[call-arg]

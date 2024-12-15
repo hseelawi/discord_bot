@@ -2,7 +2,7 @@
 name = "discord-bot"
 version = "0.1.0"
 description = ""
-authors = ["Haitham Seelawi <haitham.seelawi@adarga.ai>"]
+authors = ["Haitham Seelawi <haitham.seelawi@gmail.com>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
@@ -20,6 +20,8 @@ s3fs = "^2024.10.0"
 
 [tool.poetry.group.dev.dependencies]
 ruff = "^0.8.2"
+mypy = "^1.13.0"
+pandas-stubs = "^2.2.3.241126"
 
 [build-system]
 requires = ["poetry-core"]
