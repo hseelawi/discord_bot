@@ -3,6 +3,13 @@
 
 ### Features
 
+* inject the prompt file using env var (can be local or s3 stored txt file ([4f2ceb6](https://github.com/hseelawi/discord_bot/commit/4f2ceb64350e4585db01b22de4ff518e855eb01a))
+
+# [1.1.0](https://github.com/hseelawi/discord_bot/compare/v1.0.3...v1.1.0) (2024-12-15)
+
+
+### Features
+
 * inject the prompt file using env var (can be local or s3 stored txt file ([9a7a890](https://github.com/hseelawi/discord_bot/commit/9a7a890900397447579b7961509670d7392f504d))
 
 ## [1.0.3](https://github.com/hseelawi/discord_bot/compare/v1.0.2...v1.0.3) (2024-12-14)
