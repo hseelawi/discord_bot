@@ -2,7 +2,7 @@
 Discord Birthday Bot
 
 A Discord bot that automatically sends birthday wishes to server members on their birthday.
-The bot reads birthday data from a CSV file, generates personalised messages using Claude AI,
+The bot reads birthday data from a CSV file, generates unique messages using Claude AI,
 and sends birthday messages along with GIFs from Tenor to a specified channel.
 
 The bot reads the following configuration from settings:
@@ -99,7 +99,7 @@ def read_file_content(file_path: str) -> str:
 
 async def get_birthday_message(mention: str) -> str:
     """
-    Generate a personalised birthday message using Claude AI.
+    Generate a unique birthday message using Claude AI.
 
     Args:
         mention (str): The Discord mention string for the birthday celebrant
@@ -199,7 +199,7 @@ async def on_ready():
     This event handler:
     1. Sends a heartbeat message for execution tracking
     2. Checks for today's birthday celebrants
-    3. Sends personalised messages and GIFs for each celebrant
+    3. Sends unique messages and GIFs for each celebrant
     4. Closes the bot after completion
 
     Notes:

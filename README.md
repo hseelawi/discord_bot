@@ -1,10 +1,12 @@
 # Discord Birthday Bot 🎂
-A Discord bot that automatically sends playfully mean birthday wishes and GIFs to server members on their birthdays.
+A Discord bot that automatically sends birthday wishes and GIFs to server members on their birthdays.
 
 ## Requirements
 - Python 3.11
 - Poetry 1.8.3
-- Docker (optional but highly recommended)
+- Docker
+
+Ubuntu 24.04 was used as the OS for the dev environment. 
 
 ## Project Structure
 ```
@@ -39,8 +41,8 @@ TENOR_API_KEY=your_tenor_api_key
 TENOR_QUERY=birthday+dance    # Search query for Tenor GIFs
 CLAUDE_API_KEY=your_claude_api_key
 CLAUDE_MODEL=claude-3-sonnet-20240229
-DATA_PATH=path_to_birthdays_data    # Local file path or S3 URI to birthday csv (see [Birthday Data](#birthday-data) section below)
-CLAUDE_PROMPT_PATH=path_to_prompt    # Local file path or S3 URI to prompt file (see [Prompt Configuration](#prompt-configuration) section below)
+DATA_PATH=path_to_birthdays_data    # Local file path or S3 URI to birthday csv (see Birthday Data section below)
+CLAUDE_PROMPT_PATH=path_to_txt_file_with_prompt    # Local file path or S3 URI to prompt file (see Prompt Configuration section below)
 ```
 
 ## Birthday Data
@@ -56,7 +58,21 @@ The columns are:
 - `birthday`: Birthday in YYYY-MM-DD format
 
 ## Prompt Configuration
-The bot uses a prompt template specified by the `CLAUDE_PROMPT_PATH` environment variable to generate birthday messages. This file can be stored locally or in an S3 bucket. The prompt file contains the template text that Claude will use to generate personalised birthday messages for each user.
+The bot uses a prompt template specified by the `CLAUDE_PROMPT_PATH` environment variable to generate birthday messages. This file can be stored locally or in an S3 bucket. The prompt file contains the template text that Claude will use to generate unique birthday messages for each user.
+
+Example prompt template:
+
+```
+Generate a mean birthday message with emojis. Make it playfully insulting but not offensive. Always start with Happy Birthday!
+        Good examples:
+        "🎂 Happy Birthday! Another year older, still can't dress yourself! 👴"
+        "🎈 Happy Birthday! Your age is now approaching your IQ - congratulations on the improvement! 🤓"
+        Bad examples:
+        Here's a funny birthday message: "Happy birthday to someone who..."
+        "A birthday message for you: Getting older but not wiser..."
+        "I've generated this birthday wish: Age is just a number..."
+        Generate only the message text without any introductory or closing phrases.
+```
 
 ## Running the Bot
 
@@ -105,7 +121,7 @@ The bot is deployed on AWS using:
 
 The bot runs as a containerised application that:
 1. Reads birthday data from the configured source
-2. Generates personalised messages using Claude
+2. Generates unique messages using Claude
 3. Fetches celebration GIFs from Tenor 
 4. Posts the birthday wishes to Discord
 
