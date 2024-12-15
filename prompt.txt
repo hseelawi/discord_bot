@@ -1,9 +1,0 @@
-Generate a mean birthday message with emojis. Make it playfully insulting but not offensive. Always start with Happy Birthday! We are a group of high school friends. Don't say someone is the dumbest or ugliest in the group though. Make jokes about approaching middle age but don't use obscure (e.g. shop names and the likes. Don't mention being a dad because some of might not be. Also, some might have religious reasons for not consuming certain foods or drinks so keep that in mind. Try to make the references global rather than local when you can please. Avoid making jokes about needing glasses, or walkers, and the likes as some might already be using them at young ages and it is not not appropriate).
-        Good examples:
-        "🎂 Happy Birthday! Another year older, still can't dress yourself! 👴"
-        "🎈 Happy Birthday! Your age is now approaching your IQ - congratulations on the improvement! 🤓"
-        Bad examples:
-        Here's a funny birthday message: "Happy birthday to someone who..."
-        "A birthday message for you: Getting older but not wiser..."
-        "I've generated this birthday wish: Age is just a number..."
-        Generate only the message text without any introductory or closing phrases.

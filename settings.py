@@ -1,25 +1,4 @@
-"""
-Settings Module
-This module manages configuration settings for the Discord Birthday Bot using Pydantic.
-It loads configuration from environment variables and/or a .env file, providing
-type validation and documentation for all required settings.
-
-The module uses Pydantic's BaseSettings for automatic environment variable loading
-and validation, with LRU caching to prevent repeated file reads.
-
-Environment Variables:
-    DISCORD_TOKEN: Discord bot authentication token
-    CHANNEL_ID: Discord channel identifier (integer)
-    HEARTBEAT_CHANNEL_ID: Discord channel identifier for heartbeat messages (integer)
-    TENOR_API_KEY: Tenor API key for GIF fetching
-    CLAUDE_API_KEY: Claude API key for generating birthday wishes
-    CLAUDE_MODEL: Claude model identifier for generating messages
-    TENOR_QUERY: Query string for searching Tenor GIFs
-    DATA_PATH: Path to CSV file containing user birthdays and information
-"""
-
 from functools import lru_cache
-from pathlib import Path
 
 from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -46,8 +25,7 @@ class Settings(BaseSettings):
         description="Claude model to use for generating the birthday message"
     )
     tenor_query: str = Field(description="Query to search tenor API for relevant gifs")
-    claude_prompt: str = Path("prompt.txt").read_text(encoding="utf-8").strip()
-
+    claude_prompt_path: str = Field(description="Path to prompt file (local or s3://)")
     data_path: str = Field(
         description="Path to CSV file containing user birthdays and information"
     )

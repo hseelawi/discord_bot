@@ -10,7 +10,6 @@ A Discord bot that automatically sends playfully mean birthday wishes and GIFs t
 ```
 .
 ├── main.py         # Bot implementation
-├── prompt.txt      # Claude prompt template
 ├── settings.py     # Configuration settings
 ├── poetry.lock     # Poetry dependency lock file
 ├── pyproject.toml  # Poetry project configuration
@@ -40,7 +39,8 @@ TENOR_API_KEY=your_tenor_api_key
 TENOR_QUERY=birthday+dance    # Search query for Tenor GIFs
 CLAUDE_API_KEY=your_claude_api_key
 CLAUDE_MODEL=claude-3-sonnet-20240229
-DATA_PATH=path_to_birthdays_data    # Local file path or S3 URI to birthday csv (see section below)
+DATA_PATH=path_to_birthdays_data    # Local file path or S3 URI to birthday csv (see [Birthday Data](#birthday-data) section below)
+CLAUDE_PROMPT_PATH=path_to_prompt    # Local file path or S3 URI to prompt file (see [Prompt Configuration](#prompt-configuration) section below)
 ```
 
 ## Birthday Data
@@ -54,6 +54,9 @@ johndoe,1995-07-30
 The columns are:
 - `username`: Discord username
 - `birthday`: Birthday in YYYY-MM-DD format
+
+## Prompt Configuration
+The bot uses a prompt template specified by the `CLAUDE_PROMPT_PATH` environment variable to generate birthday messages. This file can be stored locally or in an S3 bucket. The prompt file contains the template text that Claude will use to generate personalised birthday messages for each user.
 
 ## Running the Bot
 
@@ -95,7 +98,7 @@ The bot will:
 
 The bot is deployed on AWS using:
 - EventBridge Scheduler: Triggers the bot daily at 11 AM UTC
-- Step Functions: Orchestrates the execution flow and handles failures  
+- Step Functions: Orchestrates the execution flow and handles failures
 - ECS Fargate: Runs the bot in a containerised environment
 - SNS: Handles failure notifications
 - Discord API: Sends birthday messages to the configured channel

@@ -40,7 +40,7 @@ RUN apt-get update && \
 COPY --from=builder /usr/local/lib/python3.11/site-packages/ /usr/local/lib/python3.11/site-packages/
 
 # Copy application files
-COPY prompt.txt main.py settings.py ./
+COPY main.py settings.py ./
 # Ensure copied files have correct ownership
 RUN chown -R botuser:botuser /app
 

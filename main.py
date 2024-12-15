@@ -2,7 +2,7 @@
 Discord Birthday Bot
 
 A Discord bot that automatically sends birthday wishes to server members on their birthday.
-The bot reads birthday data from a CSV file, generates personalized messages using Claude AI,
+The bot reads birthday data from a CSV file, generates personalised messages using Claude AI,
 and sends birthday messages along with GIFs from Tenor to a specified channel.
 
 The bot reads the following configuration from settings:
@@ -11,7 +11,7 @@ The bot reads the following configuration from settings:
     - heartbeat_channel_id: Channel ID for tracking script execution
     - claude_api_key: Anthropic API key for message generation
     - claude_model: Anthropic model for text message generation
-    - claude_prompt: Birthday message prompt template
+    - claude_prompt_path: Path to birthday prompt file (local or s3://)
     - tenor_api_key: Tenor API key for GIF retrieval
     - tenor_query: Search query for birthday GIFs
     - data_path: Path to csv containing user birthday and username (can be local or s3path)
@@ -20,10 +20,13 @@ The bot reads the following configuration from settings:
 import logging
 import random
 from datetime import datetime
+from pathlib import Path
+from urllib.parse import urlparse
 
 import aiohttp
 import discord
 import pandas as pd
+import s3fs  # type: ignore
 from anthropic import Anthropic
 from discord.ext import commands
 
@@ -53,9 +56,50 @@ async def send_heartbeat(channel):
         logger.error(f"Failed to send heartbeat message: {e}")
 
 
-async def get_birthday_message(mention):
+def read_file_content(file_path: str) -> str:
     """
-    Generate a personalized birthday message using Claude AI.
+    Read content from either a local file or S3 path.
+
+    Args:
+        file_path (str): Path to the file. Can be local path or s3:// URL
+
+    Returns:
+        str: Content of the file
+
+    Raises:
+        FileNotFoundError: If the file doesn't exist
+        ValueError: If the S3 path is malformed
+    """
+
+    def is_s3_path(path: str) -> bool:
+        return path.startswith("s3://")
+
+    try:
+        if is_s3_path(file_path):
+            # Parse S3 URL
+            parsed = urlparse(file_path)
+            bucket = parsed.netloc
+            key = parsed.path.lstrip("/")
+
+            # Initialise S3 filesystem
+            fs = s3fs.S3FileSystem(anon=False)
+
+            # Read from S3
+            with fs.open(f"{bucket}/{key}", "r") as f:
+                return f.read().strip()
+        else:
+            # Read local file
+            return Path(file_path).read_text(encoding="utf-8").strip()
+
+    except FileNotFoundError as err:
+        raise FileNotFoundError(f"File not found: {file_path}") from err
+    except Exception as err:
+        raise Exception(f"Error reading file: {err!s}") from err
+
+
+async def get_birthday_message(mention: str) -> str:
+    """
+    Generate a personalised birthday message using Claude AI.
 
     Args:
         mention (str): The Discord mention string for the birthday celebrant
@@ -64,19 +108,33 @@ async def get_birthday_message(mention):
         str: The formatted birthday message including the mention and AI-generated content
 
     Notes:
-        Falls back to a simple default message if Claude API call fails
+        - Attempts to read prompt from file (local or S3) specified in settings
+        - Falls back to a simple default message if either file reading or Claude API fails
+        - Logs specific errors for debugging purposes
     """
     try:
+        # Try to read the prompt from the specified path
+        prompt = read_file_content(settings.claude_prompt_path)
+
+        # Generate message using Claude
         completion = anthropic.messages.create(
             model=settings.claude_model,
             max_tokens=150,
             temperature=0.9,
-            messages=[{"role": "user", "content": settings.claude_prompt}],
+            messages=[{"role": "user", "content": prompt}],
         )
-        message = completion.content[0].text.strip()
+        message = completion.content[0].text.strip()  # type: ignore[union-attr]
         return f"{mention} {message}"
+
+    except FileNotFoundError as e:
+        logger.error(f"Failed to find prompt file: {e}")
+        return f"{mention} 🎉 Happy Birthday! 🎂"
+
     except Exception as e:
-        logger.error(f"Failed to generate message using Claude: {e}")
+        if isinstance(e, (ValueError, IOError)):
+            logger.error(f"Failed to read prompt file: {e}")
+        else:
+            logger.error(f"Failed to generate message using Claude: {e}")
         return f"{mention} 🎉 Happy Birthday! 🎂"
 
 
@@ -141,7 +199,7 @@ async def on_ready():
     This event handler:
     1. Sends a heartbeat message for execution tracking
     2. Checks for today's birthday celebrants
-    3. Sends personalized messages and GIFs for each celebrant
+    3. Sends personalised messages and GIFs for each celebrant
     4. Closes the bot after completion
 
     Notes:
